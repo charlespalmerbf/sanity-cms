@@ -1,8 +1,11 @@
 import {defineField, defineType} from 'sanity'
 
+import {CalendarIcon} from '@sanity/icons'
+
 export const eventType = defineType({
   name: 'event',
   title: 'Event',
+  icon: CalendarIcon,
   type: 'document',
   groups: [
     {name: 'details', title: 'Details'},
@@ -55,7 +58,7 @@ export const eventType = defineType({
 
           return true
         }),
-        group: 'details',
+      group: 'details',
     }),
     defineField({
       name: 'headline',
@@ -80,4 +83,31 @@ export const eventType = defineType({
       group: 'details',
     }),
   ],
+  preview: {
+    select: {
+      name: 'name',
+      venue: 'venue.name',
+      artist: 'headline.name',
+      date: 'date',
+      image: 'image',
+    },
+    prepare({name, venue, artist, date, image}) {
+      const nameFormatted = name || 'Untitled event'
+      const dateFormatted = date
+        ? new Date(date).toLocaleDateString(undefined, {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+          })
+        : 'No date'
+
+      return {
+        title: artist ? `${nameFormatted} (${artist})` : nameFormatted,
+        subtitle: venue ? `${dateFormatted} at ${venue}` : dateFormatted,
+        media: image || CalendarIcon,
+      }
+    },
+  },
 })
